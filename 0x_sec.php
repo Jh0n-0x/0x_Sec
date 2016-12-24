@@ -139,8 +139,8 @@
 
 	exemplos:
 
-	php CSRF.php CSRF -u http://www.pablo.com/
-	php CSRF.php CSRF -url sites.txt
+	php 0x_sec.php CSRF -u http://www.pablo.com/
+	php 0x_sec.php CSRF -url sites.txt
 
 	";
 
